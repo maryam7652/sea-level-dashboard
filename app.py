@@ -11,7 +11,7 @@ st.set_page_config(page_title="Sea Level Dashboard",
 # Injecting dynamic CSS using Streamlit's native variables to support BOTH Light and Dark modes
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=300;400;500;600;700&display=swap');
 
 /* Typography baseline */
 * { font-family: 'Space Grotesk', sans-serif; }
@@ -259,7 +259,7 @@ with tab1:
         <div><p class="chart-info-title">Altimeter Type Distribution</p>
         <p class="chart-info-desc">Proportional split between dual and single frequency altimeter types</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.pie_chart(filtered_df), theme="streamlit")
+    st.pyplot(charts.pie_chart(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -268,7 +268,7 @@ with tab1:
         <div><p class="chart-info-title">Sea Level Variation Distribution</p>
         <p class="chart-info-desc">Frequency histogram of GMSL values across all measurements</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.histogram(filtered_df), theme="streamlit")
+    st.pyplot(charts.histogram(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -277,7 +277,7 @@ with tab1:
         <div><p class="chart-info-title">Measurements by Altimeter Type</p>
         <p class="chart-info-desc">Count of total readings taken by each altimeter instrument</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.count_plot(filtered_df), theme="streamlit")
+    st.pyplot(charts.count_plot(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 2 ──
@@ -290,7 +290,7 @@ with tab2:
         <div><p class="chart-info-title">Sea Level Rise Over Time</p>
         <p class="chart-info-desc">Raw and smoothed GMSL from 1993 to 2025 showing clear upward trend</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.line_chart(filtered_df), theme="streamlit")
+    st.pyplot(charts.line_chart(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -299,7 +299,7 @@ with tab2:
         <div><p class="chart-info-title">Average Sea Level by Decade</p>
         <p class="chart-info-desc">Bar comparison of mean sea level values across each decade</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.bar_chart(filtered_df), theme="streamlit")
+    st.pyplot(charts.bar_chart(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -308,7 +308,7 @@ with tab2:
         <div><p class="chart-info-title">Cumulative Sea Level Rise</p>
         <p class="chart-info-desc">Area chart showing the total accumulated rise over the entire period</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.area_chart(filtered_df), theme="streamlit")
+    st.pyplot(charts.area_chart(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 3 ──
@@ -321,7 +321,7 @@ with tab3:
         <div><p class="chart-info-title">GIA vs Non-GIA Measurements</p>
         <p class="chart-info-desc">Scatter relationship between corrected and uncorrected sea level readings</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.scatter_plot(filtered_df), theme="streamlit")
+    st.pyplot(charts.scatter_plot(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -330,7 +330,7 @@ with tab3:
         <div><p class="chart-info-title">Sea Level Distribution by Era</p>
         <p class="chart-info-desc">Box plot showing spread, median and outliers per era</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.box_plot(filtered_df), theme="streamlit")
+    st.pyplot(charts.box_plot(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -339,7 +339,7 @@ with tab3:
         <div><p class="chart-info-title">Feature Correlation Heatmap</p>
         <p class="chart-info-desc">Correlation matrix between all sea level measurement variables</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.heatmap(filtered_df), theme="streamlit")
+    st.pyplot(charts.heatmap(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -348,7 +348,7 @@ with tab3:
         <div><p class="chart-info-title">Sea Level Density by Era</p>
         <p class="chart-info-desc">Violin plot showing probability density of sea level per era</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.violin_plot(filtered_df), theme="streamlit")
+    st.pyplot(charts.violin_plot(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 4 ──
@@ -375,7 +375,7 @@ with tab5:
         <div><p class="chart-info-title">Pair Plot - Sea Level Features</p>
         <p class="chart-info-desc">Relationships between all sea level measurement variables combined</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.pair_plot(filtered_df), theme="streamlit")
+    st.pyplot(charts.pair_plot(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -384,7 +384,7 @@ with tab5:
         <div><p class="chart-info-title">Bubble Chart - Sea Level by Decade</p>
         <p class="chart-info-desc">Bubble size = total observations. Color intensity = sea level rise.</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.bubble_chart(filtered_df), theme="streamlit")
+    st.pyplot(charts.bubble_chart(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -393,5 +393,5 @@ with tab5:
         <div><p class="chart-info-title">Funnel Chart - Measurements by Era</p>
         <p class="chart-info-desc">Distribution of total satellite measurements across time eras</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.funnel_chart(filtered_df), theme="streamlit")
+    st.pyplot(charts.funnel_chart(filtered_df))
     st.markdown('</div>', unsafe_allow_html=True)

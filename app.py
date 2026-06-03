@@ -11,7 +11,7 @@ st.set_page_config(page_title="Sea Level Dashboard",
 # Injecting dynamic CSS using Streamlit's native variables to support BOTH Light and Dark modes
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* Typography baseline */
 * { font-family: 'Space Grotesk', sans-serif; }
@@ -146,18 +146,28 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(128,128,128,0.2); }
 
-/* TABS */
+/* TABS - NOW WITH PROPER SPACING AND PADDING */
 .stTabs [data-baseweb="tab-list"] {
     background: var(--secondary-background-color) !important;
     border: 1px solid rgba(128,128,128,0.2) !important;
-    border-radius: 10px !important; padding: 3px !important; gap: 2px !important;
+    border-radius: 10px !important; 
+    padding: 4px !important; 
+    gap: 4px !important;
 }
 .stTabs [data-baseweb="tab"] {
-    background: transparent !important; border-radius: 7px !important;
-    color: var(--text-color) !important; font-size: 0.8rem !important; font-weight: 500 !important;
+    background: transparent !important; 
+    border-radius: 7px !important;
+    color: var(--text-color) !important; 
+    font-size: 0.85rem !important; 
+    font-weight: 500 !important;
+    padding: 0.5rem 1rem !important; 
+    margin: 0 !important;
+    border: none !important;
 }
 .stTabs [aria-selected="true"] {
-    background: rgba(0,200,255,0.12) !important; color: #00ccff !important; font-weight: 600 !important;
+    background: rgba(0,200,255,0.15) !important; 
+    color: #00ccff !important; 
+    font-weight: 600 !important;
 }
 </style>
 """, unsafe_allow_html=True)

@@ -64,14 +64,24 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
 .stButton > button {
     background: linear-gradient(135deg, #0066ff, #00ccff) !important;
     border: none !important;
-    color: white !important; /* Button text stays white on the blue gradient */
+    color: white !important; 
     width: 100%;
     border-radius: 8px !important;
     font-weight: 600 !important;
     font-size: 0.8rem !important;
     padding: 0.5rem !important;
     margin-top: 0.5rem;
+    transition: all 0.3s ease !important;
 }
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 204, 255, 0.3);
+}
+
+
+/* =========================================
+   INTERACTIVITY & HOVER EFFECTS
+   ========================================= */
 
 /* HERO SECTION */
 .hero {
@@ -82,6 +92,12 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     margin-bottom: 1.5rem;
     position: relative;
     overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+}
+.hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0, 204, 255, 0.12);
+    border-color: rgba(0, 204, 255, 0.4);
 }
 .hero::after {
     content: '';
@@ -109,8 +125,19 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     background: var(--secondary-background-color);
     border: 1px solid rgba(128,128,128,0.2);
     border-radius: 10px; padding: 1.2rem 1.5rem; position: relative; overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
-.metric-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.metric-item:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    border-color: rgba(128, 128, 128, 0.4);
+    z-index: 10;
+}
+.metric-item::before { 
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; 
+    transition: height 0.3s ease;
+}
+.metric-item:hover::before { height: 4px; }
 .metric-item.blue::before { background: linear-gradient(90deg, #0066ff, #00ccff); }
 .metric-item.teal::before { background: linear-gradient(90deg, #00ccff, #00ffcc); }
 .metric-item.purple::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
@@ -122,12 +149,32 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
 .metric-value { font-size: 1.8rem; font-weight: 700; color: var(--text-color) !important; line-height: 1; }
 .metric-sub { font-size: 0.72rem; color: var(--text-color) !important; opacity: 0.5; margin-top: 0.3rem; }
 
-/* CHARTS */
+
+/* CHART CARDS */
 .chart-card {
     background: var(--secondary-background-color);
     border: 1px solid rgba(128,128,128,0.2);
     border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+.chart-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    border-color: rgba(128, 128, 128, 0.35);
+}
+
+/* FROSTED GLASS BACKGROUND FOR CHARTS (Fixes the dark mode text legibility glitch) */
+[data-testid="stImage"] {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+.chart-card:hover [data-testid="stImage"] {
+    transform: scale(1.01);
+}
+
 .chart-card-header {
     display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 1rem; padding-bottom: 0.8rem;
     border-bottom: 1px solid rgba(128,128,128,0.1);
@@ -146,7 +193,7 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(128,128,128,0.2); }
 
-/* TABS - NOW WITH PROPER SPACING AND PADDING */
+/* TABS INTERACTIVITY */
 .stTabs [data-baseweb="tab-list"] {
     background: var(--secondary-background-color) !important;
     border: 1px solid rgba(128,128,128,0.2) !important;
@@ -163,11 +210,18 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     padding: 0.5rem 1rem !important; 
     margin: 0 !important;
     border: none !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(128, 128, 128, 0.1) !important;
+    transform: translateY(-2px);
 }
 .stTabs [aria-selected="true"] {
     background: rgba(0,200,255,0.15) !important; 
     color: #00ccff !important; 
     font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(0, 204, 255, 0.2);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -269,7 +323,7 @@ with tab1:
         <div><p class="chart-info-title">Altimeter Type Distribution</p>
         <p class="chart-info-desc">Proportional split between dual and single frequency altimeter types</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.pie_chart(filtered_df))
+    st.pyplot(charts.pie_chart(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -278,7 +332,7 @@ with tab1:
         <div><p class="chart-info-title">Sea Level Variation Distribution</p>
         <p class="chart-info-desc">Frequency histogram of GMSL values across all measurements</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.histogram(filtered_df))
+    st.pyplot(charts.histogram(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -287,7 +341,7 @@ with tab1:
         <div><p class="chart-info-title">Measurements by Altimeter Type</p>
         <p class="chart-info-desc">Count of total readings taken by each altimeter instrument</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.count_plot(filtered_df))
+    st.pyplot(charts.count_plot(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 2 ──
@@ -300,7 +354,7 @@ with tab2:
         <div><p class="chart-info-title">Sea Level Rise Over Time</p>
         <p class="chart-info-desc">Raw and smoothed GMSL from 1993 to 2025 showing clear upward trend</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.line_chart(filtered_df))
+    st.pyplot(charts.line_chart(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -309,7 +363,7 @@ with tab2:
         <div><p class="chart-info-title">Average Sea Level by Decade</p>
         <p class="chart-info-desc">Bar comparison of mean sea level values across each decade</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.bar_chart(filtered_df))
+    st.pyplot(charts.bar_chart(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -318,7 +372,7 @@ with tab2:
         <div><p class="chart-info-title">Cumulative Sea Level Rise</p>
         <p class="chart-info-desc">Area chart showing the total accumulated rise over the entire period</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.area_chart(filtered_df))
+    st.pyplot(charts.area_chart(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 3 ──
@@ -331,7 +385,7 @@ with tab3:
         <div><p class="chart-info-title">GIA vs Non-GIA Measurements</p>
         <p class="chart-info-desc">Scatter relationship between corrected and uncorrected sea level readings</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.scatter_plot(filtered_df))
+    st.pyplot(charts.scatter_plot(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -340,7 +394,7 @@ with tab3:
         <div><p class="chart-info-title">Sea Level Distribution by Era</p>
         <p class="chart-info-desc">Box plot showing spread, median and outliers per era</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.box_plot(filtered_df))
+    st.pyplot(charts.box_plot(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -349,7 +403,7 @@ with tab3:
         <div><p class="chart-info-title">Feature Correlation Heatmap</p>
         <p class="chart-info-desc">Correlation matrix between all sea level measurement variables</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.heatmap(filtered_df))
+    st.pyplot(charts.heatmap(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -358,7 +412,7 @@ with tab3:
         <div><p class="chart-info-title">Sea Level Density by Era</p>
         <p class="chart-info-desc">Violin plot showing probability density of sea level per era</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.violin_plot(filtered_df))
+    st.pyplot(charts.violin_plot(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 4 ──
@@ -385,7 +439,7 @@ with tab5:
         <div><p class="chart-info-title">Pair Plot - Sea Level Features</p>
         <p class="chart-info-desc">Relationships between all sea level measurement variables combined</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.pair_plot(filtered_df))
+    st.pyplot(charts.pair_plot(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -394,7 +448,7 @@ with tab5:
         <div><p class="chart-info-title">Bubble Chart - Sea Level by Decade</p>
         <p class="chart-info-desc">Bubble size = total observations. Color intensity = sea level rise.</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.bubble_chart(filtered_df))
+    st.pyplot(charts.bubble_chart(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -403,5 +457,5 @@ with tab5:
         <div><p class="chart-info-title">Funnel Chart - Measurements by Era</p>
         <p class="chart-info-desc">Distribution of total satellite measurements across time eras</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.funnel_chart(filtered_df))
+    st.pyplot(charts.funnel_chart(filtered_df), transparent=True)
     st.markdown('</div>', unsafe_allow_html=True)

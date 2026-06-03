@@ -1,162 +1,268 @@
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import seaborn as sns
 import numpy as np
 
+# ── THEME HELPER ──────────────────────────────────────────────────
+# A soft, elegant neutral palette to contrast against the full pink UI
+NEUTRAL_PALETTE = ["#0ea5e9", "#8b5cf6", "#f59e0b", "#10b981", "#6366f1", "#ec4899"]
+
+def _base_fig(w=10, h=5):
+    """Return a figure + axes with transparent bg so it merges with the Pink UI."""
+    fig, ax = plt.subplots(figsize=(w, h))
+    fig.patch.set_alpha(0.0)          
+    ax.set_facecolor("none")          
+    ax.tick_params(colors="#888888", labelsize=9)
+    for spine in ax.spines.values():
+        spine.set_edgecolor("rgba(128,128,128,0.25)")
+    ax.title.set_color("#888888")
+    ax.xaxis.label.set_color("#888888")
+    ax.yaxis.label.set_color("#888888")
+    return fig, ax
+
+def _style_ax(ax):
+    """Apply consistent grid + spine styling to any axes."""
+    ax.grid(True, color="rgba(128,128,128,0.15)", linewidth=0.7, linestyle="--")
+    ax.set_axisbelow(True)
+    for spine in ax.spines.values():
+        spine.set_edgecolor("rgba(128,128,128,0.25)")
+    ax.tick_params(colors="#888888", labelsize=9)
+    return ax
+
+# ── CHARTS ────────────────────────────────────────────────────────
+
 def pie_chart(df):
-    fig, ax = plt.subplots(figsize=(7,7))
+    fig, ax = plt.subplots(figsize=(7, 7))
+    fig.patch.set_alpha(0.0)
+    ax.set_facecolor("none")
     counts = df['altimeter_label'].value_counts()
+    
     if counts.empty:
-        ax.text(0.5, 0.5, 'No data', ha='center')
+        ax.text(0.5, 0.5, 'No data available', ha='center', va='center', color='#888', fontsize=12)
+        ax.axis('off')
     else:
-        ax.pie(counts, labels=counts.index, autopct='%1.1f%%',
-               colors=['#4facfe', '#f093fb'], startangle=90)
-    ax.set_title('Altimeter Type Distribution', fontsize=14, fontweight='bold')
+        colors = ["#0ea5e9", "#8b5cf6"]
+        wedges, texts, autotexts = ax.pie(
+            counts, labels=counts.index, autopct='%1.1f%%',
+            colors=colors, startangle=90,
+            wedgeprops=dict(edgecolor='white', linewidth=2),
+        )
+        for t in texts:
+            t.set_color("#888888")
+            t.set_fontsize(11)
+        for at in autotexts:
+            at.set_color("white")
+            at.set_fontsize(10)
+            at.set_fontweight("bold")
+            
+    ax.set_title('Altimeter Type Distribution', fontsize=14, fontweight='bold', color='#888888', pad=12)
     return fig
 
 def histogram(df):
-    fig, ax = plt.subplots(figsize=(10,5))
-    ax.hist(df['gmsl_gia'].dropna(), bins=30, color='steelblue')
-    ax.set_title('Distribution of Sea Level Variations', fontsize=14, fontweight='bold')
+    fig, ax = _base_fig(10, 5)
+    data = df['gmsl_gia'].dropna()
+    n, bins, patches = ax.hist(data, bins=30, color="#0ea5e9", edgecolor='white', linewidth=0.6, alpha=0.85)
+    
+    norm = mpl.colors.Normalize(vmin=bins.min(), vmax=bins.max())
+    cmap = mpl.cm.Blues
+    for patch, left in zip(patches, bins[:-1]):
+        patch.set_facecolor(cmap(norm(left) * 0.7 + 0.3))
+        
+    ax.set_title('Distribution of Sea Level Variations', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Sea Level Variation (mm)')
     ax.set_ylabel('Frequency')
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def line_chart(df):
-    fig, ax = plt.subplots(figsize=(14,5))
-    ax.plot(df['year'], df['gmsl_gia'], color='royalblue', alpha=0.6, linewidth=0.8)
-    ax.plot(df['year'], df['smooth_gia'], color='#ff4d4d', linewidth=2.5, label='Smoothed')
-    ax.set_title('Global Mean Sea Level Rise Over Time', fontsize=14, fontweight='bold')
+    fig, ax = _base_fig(14, 5)
+    ax.plot(df['year'], df['gmsl_gia'], color="#0ea5e9", alpha=0.45, linewidth=0.9, label='Raw GMSL')
+    ax.plot(df['year'], df['smooth_gia'], color="#f59e0b", linewidth=2.5, label='Smoothed', zorder=3)
+    ax.fill_between(df['year'], df['gmsl_gia'], alpha=0.06, color="#0ea5e9")
+                    
+    ax.set_title('Global Mean Sea Level Rise Over Time', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Year')
     ax.set_ylabel('Sea Level Variation (mm)')
-    ax.legend()
-    ax.grid(True)
+    ax.legend(framealpha=0.0, labelcolor="#888888")
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def bar_chart(df):
-    fig, ax = plt.subplots(figsize=(10,5))
+    fig, ax = _base_fig(10, 5)
     decade_avg = df.groupby('decade')['gmsl_gia'].mean().reset_index()
-    sns.barplot(data=decade_avg, x='decade', y='gmsl_gia',
-                hue='decade', palette='viridis', legend=False, ax=ax)
-    ax.set_title('Average Sea Level by Decade', fontsize=14, fontweight='bold')
+    bars = ax.bar(decade_avg['decade'].astype(str), decade_avg['gmsl_gia'],
+                  color=NEUTRAL_PALETTE[:len(decade_avg)],
+                  edgecolor='white', linewidth=0.8, width=0.55)
+                  
+    for bar in bars:
+        h = bar.get_height()
+        ax.text(bar.get_x() + bar.get_width() / 2, h + 0.8,
+                f'{h:.1f}', ha='center', va='bottom', fontsize=9, color='#888888')
+                
+    ax.set_title('Average Sea Level by Decade', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Decade')
     ax.set_ylabel('Average Sea Level Variation (mm)')
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def scatter_plot(df):
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = _base_fig(10, 6)
     sample = df.sample(min(500, len(df)), random_state=42)
-    ax.scatter(sample['gmsl_no_gia'], sample['gmsl_gia'], alpha=0.5, color='#00ccff', s=15)
-    ax.set_title('GMSL with GIA vs without GIA', fontsize=14, fontweight='bold')
+    sc = ax.scatter(sample['gmsl_no_gia'], sample['gmsl_gia'], alpha=0.55, color="#8b5cf6", s=18, edgecolors='none')
+                    
+    ax.set_title('GMSL with GIA vs without GIA', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('GMSL without GIA (mm)')
     ax.set_ylabel('GMSL with GIA (mm)')
-    ax.grid(True)
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def box_plot(df):
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = _base_fig(10, 6)
     filtered = df.dropna(subset=['era', 'gmsl_gia'])
+    
     if filtered.empty:
-        ax.text(0.5, 0.5, 'No data', ha='center')
+        ax.text(0.5, 0.5, 'No data available', ha='center', va='center', color='#888', fontsize=12)
+        ax.axis('off')
     else:
-        sns.boxplot(data=filtered, x='era', y='gmsl_gia',
-                    hue='era', palette='Set2', legend=False, ax=ax)
-    ax.set_title('Sea Level Distribution by Era', fontsize=14, fontweight='bold')
+        sns.boxplot(data=filtered, x='era', y='gmsl_gia', hue='era', palette='Set2', legend=False,
+                    ax=ax, linewidth=1.2, flierprops=dict(marker='o', markersize=4, markerfacecolor='#aaa', alpha=0.5))
+        ax.set_facecolor("none")
+        
+    ax.set_title('Sea Level Distribution by Era', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Era')
     ax.set_ylabel('Sea Level Variation (mm)')
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def heatmap(df):
-    fig, ax = plt.subplots(figsize=(10,8))
-    corr = df[['gmsl_no_gia', 'gmsl_gia', 'smooth_gia',
-               'smooth_no_gia', 'std_gia', 'num_observations']].corr()
-    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=1, ax=ax)
-    ax.set_title('Correlation Heatmap of Sea Level Features', fontsize=14, fontweight='bold')
+    fig, ax = plt.subplots(figsize=(10, 8))
+    fig.patch.set_alpha(0.0)
+    ax.set_facecolor("none")
+    corr = df[['gmsl_no_gia', 'gmsl_gia', 'smooth_gia', 'smooth_no_gia', 'std_gia', 'num_observations']].corr()
+               
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.8, linecolor='rgba(128,128,128,0.2)',
+                annot_kws={"size": 10}, ax=ax)
+                
+    ax.set_title('Correlation Heatmap of Sea Level Features', fontsize=14, fontweight='bold', color='#888888', pad=12)
+    ax.tick_params(colors='#888888', labelsize=9)
+    fig.tight_layout()
     return fig
 
 def area_chart(df):
-    fig, ax = plt.subplots(figsize=(14,5))
-    ax.fill_between(df['year'], df['smooth_gia'], alpha=0.3, color='#00ccff')
-    ax.plot(df['year'], df['smooth_gia'], color='#00ccff', linewidth=2)
-    ax.set_title('Cumulative Sea Level Rise Over Time', fontsize=14, fontweight='bold')
+    fig, ax = _base_fig(14, 5)
+    ax.fill_between(df['year'], df['smooth_gia'], alpha=0.22, color="#0ea5e9")
+    ax.plot(df['year'], df['smooth_gia'], color="#0ea5e9", linewidth=2.2)
+            
+    ax.set_title('Cumulative Sea Level Rise Over Time', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Year')
     ax.set_ylabel('Sea Level Variation (mm)')
-    ax.grid(True)
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def count_plot(df):
-    fig, ax = plt.subplots(figsize=(8,5))
-    sns.countplot(data=df, x='altimeter_label',
-                  hue='altimeter_label', palette='pastel', legend=False, ax=ax)
-    ax.set_title('Count of Measurements by Altimeter Type', fontsize=14, fontweight='bold')
+    fig, ax = _base_fig(8, 5)
+    order = df['altimeter_label'].value_counts().index.tolist()
+    
+    sns.countplot(data=df, x='altimeter_label', order=order, hue='altimeter_label', palette=NEUTRAL_PALETTE[:2],
+                  legend=False, ax=ax, edgecolor='rgba(128,128,128,0.2)', linewidth=0.8)
+    ax.set_facecolor("none")
+    
+    ax.set_title('Count of Measurements by Altimeter Type', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Altimeter Type')
     ax.set_ylabel('Count')
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def violin_plot(df):
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = _base_fig(10, 6)
     filtered = df.dropna(subset=['era', 'gmsl_gia'])
-    sns.violinplot(data=filtered, x='era', y='gmsl_gia',
-                   hue='era', palette='muted', legend=False, ax=ax)
-    ax.set_title('Sea Level Distribution by Era', fontsize=14, fontweight='bold')
+    
+    if not filtered.empty:
+        sns.violinplot(data=filtered, x='era', y='gmsl_gia', hue='era', palette='muted', legend=False,
+                       ax=ax, linewidth=1.2, inner='quartile')
+        ax.set_facecolor("none")
+        
+    ax.set_title('Sea Level Distribution by Era (Violin)', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Era')
     ax.set_ylabel('Sea Level Variation (mm)')
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def bubble_chart(df):
-    fig, ax = plt.subplots(figsize=(12,6))
+    fig, ax = _base_fig(12, 6)
     decade_stats = df.groupby('decade').agg(
-        avg_sea_level=('gmsl_gia', 'mean'),
-        avg_std=('std_gia', 'mean'),
-        total_obs=('num_observations', 'sum')
+        avg_sea_level=('gmsl_gia', 'mean'), avg_std=('std_gia', 'mean'), total_obs=('num_observations', 'sum')
     ).reset_index()
-    scatter = ax.scatter(
-        decade_stats['decade'],
-        decade_stats['avg_sea_level'],
-        s=decade_stats['total_obs'] / 500000,
-        c=decade_stats['avg_sea_level'],
-        cmap='RdYlBu_r',
-        alpha=0.8
-    )
-    for _, row in decade_stats.iterrows():
-        ax.annotate(f"{int(row['decade'])}s",
-                    (row['decade'], row['avg_sea_level']),
-                    textcoords='offset points',
-                    xytext=(0,10), ha='center', fontsize=9, fontweight='bold')
-        
-    cbar = plt.colorbar(scatter, ax=ax)
-    cbar.set_label('Avg Sea Level (mm)')
     
-    ax.set_title('Bubble Chart - Sea Level by Decade', fontsize=14, fontweight='bold')
+    scatter = ax.scatter(
+        decade_stats['decade'], decade_stats['avg_sea_level'],
+        s=decade_stats['total_obs'] / 500000, c=decade_stats['avg_sea_level'],
+        cmap='RdYlBu_r', alpha=0.82, edgecolors='rgba(128,128,128,0.2)', linewidths=1.5
+    )
+    
+    for _, row in decade_stats.iterrows():
+        ax.annotate(f"{int(row['decade'])}s", (row['decade'], row['avg_sea_level']),
+                    textcoords='offset points', xytext=(0, 12), ha='center',
+                    fontsize=9, fontweight='bold', color='#888888')
+                    
+    cbar = plt.colorbar(scatter, ax=ax)
+    cbar.set_label('Avg Sea Level (mm)', color='#888888')
+    cbar.ax.yaxis.set_tick_params(color='#888888')
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color='#888888')
+    cbar.outline.set_edgecolor('rgba(128,128,128,0.2)')
+    
+    ax.set_title('Bubble Chart — Sea Level by Decade', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Decade')
     ax.set_ylabel('Average Sea Level Variation (mm)')
-    ax.grid(True)
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def funnel_chart(df):
-    fig, ax = plt.subplots(figsize=(10,6))
+    fig, ax = _base_fig(10, 6)
     stages = {
-        'Total Measurements': len(df),
-        '1990s Measurements': len(df[df['era'] == '1990s']),
-        '2000s Measurements': len(df[df['era'] == '2000s']),
-        '2010s Measurements': len(df[df['era'] == '2010s']),
-        '2020s Measurements': len(df[df['era'] == '2020s'])
+        'Total Measurements': len(df), '1990s': len(df[df['era'] == '1990s']), '2000s': len(df[df['era'] == '2000s']),
+        '2010s': len(df[df['era'] == '2010s']), '2020s': len(df[df['era'] == '2020s']),
     }
     labels = list(stages.keys())
     values = list(stages.values())
-    colors = ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#F44336']
-    bars = ax.barh(labels, values, color=colors, height=0.5)
+    colors = ["#0ea5e9", "#10b981", "#f59e0b", "#f4845f", "#8b5cf6"]
+    
+    bars = ax.barh(labels, values, color=colors, height=0.52, edgecolor='rgba(128,128,128,0.2)', linewidth=0.8)
+                   
     for bar, val in zip(bars, values):
-        ax.text(bar.get_width() + 5, bar.get_y() + bar.get_height()/2,
-                f'{val:,}', va='center', fontsize=10)
-        
-    ax.set_title('Sea Level Measurements by Era', fontsize=14, fontweight='bold')
+        ax.text(bar.get_width() + max(values) * 0.01, bar.get_y() + bar.get_height() / 2,
+                f'{val:,}', va='center', fontsize=10, color='#888888')
+                
+    ax.set_title('Sea Level Measurements by Era', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Number of Measurements')
     ax.invert_yaxis()
+    _style_ax(ax)
+    fig.tight_layout()
     return fig
 
 def pair_plot(df):
-    sample = df[['gmsl_gia', 'gmsl_no_gia', 'smooth_gia', 'std_gia']].dropna().sample(
-        min(500, len(df)), random_state=42)
-    pg = sns.pairplot(sample, plot_kws={'alpha': 0.5, 'color': '#00ccff'})
-    pg.fig.suptitle('Pair Plot - Sea Level Features', y=1.02, fontsize=14, fontweight='bold')
+    sample = df[['gmsl_gia', 'gmsl_no_gia', 'smooth_gia', 'std_gia']].dropna().sample(min(500, len(df)), random_state=42)
+        
+    pg = sns.pairplot(
+        sample, plot_kws={'alpha': 0.45, 'color': '#0ea5e9', 's': 12}, diag_kws={'color': '#0ea5e9', 'alpha': 0.7}
+    )
+    pg.fig.patch.set_alpha(0.0)
+    
+    for ax in pg.axes.flatten():
+        if ax:
+            ax.set_facecolor("none")
+            for spine in ax.spines.values():
+                spine.set_edgecolor("rgba(128,128,128,0.2)")
+            ax.tick_params(colors='#888888', labelsize=8)
+            
+    pg.fig.suptitle('Pair Plot — Sea Level Features', y=1.02, fontsize=14, fontweight='bold', color='#888888')
     return pg.fig

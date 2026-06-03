@@ -15,7 +15,7 @@ def pie_chart(df):
 
 def histogram(df):
     fig, ax = plt.subplots(figsize=(10,5))
-    ax.hist(df['gmsl_gia'].dropna(), bins=30, color='steelblue', edgecolor='inherit')
+    ax.hist(df['gmsl_gia'].dropna(), bins=30, color='steelblue')
     ax.set_title('Distribution of Sea Level Variations', fontsize=14, fontweight='bold')
     ax.set_xlabel('Sea Level Variation (mm)')
     ax.set_ylabel('Frequency')
@@ -115,8 +115,7 @@ def bubble_chart(df):
         s=decade_stats['total_obs'] / 500000,
         c=decade_stats['avg_sea_level'],
         cmap='RdYlBu_r',
-        alpha=0.8,
-        edgecolors='inherit'
+        alpha=0.8
     )
     for _, row in decade_stats.iterrows():
         ax.annotate(f"{int(row['decade'])}s",
@@ -145,7 +144,7 @@ def funnel_chart(df):
     labels = list(stages.keys())
     values = list(stages.values())
     colors = ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#F44336']
-    bars = ax.barh(labels, values, color=colors, edgecolor='inherit', height=0.5)
+    bars = ax.barh(labels, values, color=colors, height=0.5)
     for bar, val in zip(bars, values):
         ax.text(bar.get_width() + 5, bar.get_y() + bar.get_height()/2,
                 f'{val:,}', va='center', fontsize=10)

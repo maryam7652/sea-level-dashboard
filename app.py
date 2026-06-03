@@ -18,12 +18,15 @@ h1, h2, h3, .hero-title, .sidebar-title, .metric-value {
     font-family: 'Cormorant Garamond', serif; 
 }
 
-/* Remove top padding */
+/* Remove top padding but KEEP the header visible so the sidebar toggle works! */
 .block-container { 
     padding-top: 1.5rem !important; 
     max-width: 100% !important;
 }
-header[data-testid="stHeader"], [data-testid="stDecoration"] { 
+header[data-testid="stHeader"] { 
+    background: transparent !important; 
+}
+[data-testid="stDecoration"] { 
     display: none !important; 
 }
 

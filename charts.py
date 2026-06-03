@@ -24,9 +24,9 @@ def _base_fig(w=10, h=5):
         label.set_path_effects(OUTLINE)
         label.set_fontweight('bold')
         
-    # Style Spines (Borders)
+    # Style Spines (Borders) using Matplotlib-safe hex alpha (#f43f5e40 = 25% opacity)
     for spine in ax.spines.values():
-        spine.set_edgecolor("rgba(244, 63, 94, 0.25)")
+        spine.set_edgecolor("#f43f5e40")
         
     # Style Titles and Axes Labels
     ax.title.set_color(TEXT_COLOR)
@@ -48,7 +48,7 @@ def _base_fig(w=10, h=5):
 
 def _style_ax(ax):
     """Apply consistent grid styling."""
-    ax.grid(True, color="rgba(244, 63, 94, 0.15)", linewidth=0.7, linestyle="--")
+    ax.grid(True, color="#f43f5e26", linewidth=0.7, linestyle="--") # #f43f5e26 = 15% opacity
     ax.set_axisbelow(True)
     return ax
 
@@ -179,7 +179,7 @@ def heatmap(df):
     ax.set_facecolor("none")
     corr = df[['gmsl_no_gia', 'gmsl_gia', 'smooth_gia', 'smooth_no_gia', 'std_gia', 'num_observations']].corr()
                
-    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.8, linecolor='rgba(244, 63, 94, 0.2)',
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.8, linecolor='#f43f5e33', # #f43f5e33 = 20% opacity
                 annot_kws={"size": 11, "weight": "bold"}, ax=ax)
                 
     ax.set_title('Correlation Heatmap of Sea Level Features', fontsize=14, fontweight='bold', color=TEXT_COLOR, pad=12).set_path_effects(OUTLINE)
@@ -209,7 +209,7 @@ def count_plot(df):
     order = df['altimeter_label'].value_counts().index.tolist()
     
     sns.countplot(data=df, x='altimeter_label', order=order, hue='altimeter_label', palette=NEUTRAL_PALETTE[:2],
-                  legend=False, ax=ax, edgecolor='rgba(244, 63, 94, 0.25)', linewidth=0.8)
+                  legend=False, ax=ax, edgecolor='#f43f5e40', linewidth=0.8)
     ax.set_facecolor("none")
     
     ax.set_title('Count of Measurements by Altimeter Type')
@@ -244,7 +244,7 @@ def bubble_chart(df):
     scatter = ax.scatter(
         decade_stats['decade'], decade_stats['avg_sea_level'],
         s=decade_stats['total_obs'] / 500000, c=decade_stats['avg_sea_level'],
-        cmap='RdYlBu_r', alpha=0.82, edgecolors='rgba(244, 63, 94, 0.25)', linewidths=1.5
+        cmap='RdYlBu_r', alpha=0.82, edgecolors='#f43f5e40', linewidths=1.5
     )
     
     for _, row in decade_stats.iterrows():
@@ -261,7 +261,7 @@ def bubble_chart(df):
         label.set_fontweight('bold')
         label.set_path_effects(OUTLINE)
         
-    cbar.outline.set_edgecolor('rgba(244, 63, 94, 0.25)')
+    cbar.outline.set_edgecolor('#f43f5e40')
     
     ax.set_title('Bubble Chart — Sea Level by Decade')
     ax.set_xlabel('Decade')
@@ -280,7 +280,7 @@ def funnel_chart(df):
     values = list(stages.values())
     colors = ["#0ea5e9", "#10b981", "#f59e0b", "#f4845f", "#8b5cf6"]
     
-    bars = ax.barh(labels, values, color=colors, height=0.52, edgecolor='rgba(244, 63, 94, 0.25)', linewidth=0.8)
+    bars = ax.barh(labels, values, color=colors, height=0.52, edgecolor='#f43f5e40', linewidth=0.8)
                    
     for bar, val in zip(bars, values):
         txt = ax.text(bar.get_width() + max(values) * 0.01, bar.get_y() + bar.get_height() / 2,
@@ -306,7 +306,7 @@ def pair_plot(df):
         if ax:
             ax.set_facecolor("none")
             for spine in ax.spines.values():
-                spine.set_edgecolor("rgba(244, 63, 94, 0.25)")
+                spine.set_edgecolor("#f43f5e40")
             ax.tick_params(colors=TEXT_COLOR, labelsize=9)
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_path_effects(OUTLINE)

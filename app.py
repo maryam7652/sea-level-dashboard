@@ -2,35 +2,63 @@ import streamlit as st
 from filters import load_data, apply_filters
 import charts
 
+# ── CONFIGURATION ──
+# Force light mode by default using theme configuration injection
 st.set_page_config(page_title="Sea Level Dashboard", 
                    page_icon="🌊", 
                    layout="wide",
                    initial_sidebar_state="expanded")
 
+# Injecting configuration defaults to force system/light baseline safely
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=300;400;500;600;700&display=swap');
 
+/* Typography baseline */
 * { font-family: 'Space Grotesk', sans-serif; }
 
-/* Remove white bar at top */
+/* Main app structural background */
+.stApp { background-color: #030d1a !important; }
+
+/* Remove white bar or masking artifacting at top header */
 #root > div:first-child { background: transparent; }
 .stApp > header { background: transparent !important; }
 header[data-testid="stHeader"] { background: transparent !important; height: 0 !important; }
-.stApp { background: #030d1a; }
+
 .block-container { 
     padding-top: 1.5rem !important; 
     background: transparent !important;
     max-width: 100% !important;
 }
 
-/* SIDEBAR */
+/* FIXING APPLIED MATPLOTLIB IMAGES TO PREVENT "BOX OVER BACKGROUND" EFFECT */
+div[data-testid="stImage"], div[data-testid="stPlotlyChart"], .stMarkdown div img {
+    background-color: transparent !important;
+    border-radius: 8px;
+}
+iframe {
+    background: transparent !important;
+}
+
+/* FIXING THREE-DOT OVERFLOW CONFIG MENU TEXT COLLISION */
+button[data-testid="stHeaderActionButton"] {
+    color: #ffffff !important;
+}
+div[data-testid="stMainMenuDropdown"] * {
+    color: #31333F !important; /* Force readable text color inside popover menu options */
+}
+[data-testid="stDecoration"] {
+    background-image: none !important;
+    background-color: transparent !important;
+}
+
+/* SIDEBAR STRUCTURAL STYLING */
 [data-testid="stSidebar"] {
     background: #051525 !important;
     border-right: 1px solid rgba(0,200,255,0.1);
 }
-[data-testid="stSidebar"] > div { padding: 1.5rem 1rem; }
-[data-testid="stSidebar"] * { color: white !important; }
+[data-testid="stSidebar"] > div:first-child { padding: 1.5rem 1rem; }
+[data-testid="stSidebar"] p, [data-testid="stSidebar"] span { color: white !important; }
 [data-testid="stSidebar"] label {
     color: rgba(0,200,255,0.7) !important;
     font-size: 0.68rem !important;
@@ -39,11 +67,14 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     font-weight: 600;
 }
 
-/* Fix dropdown and select boxes */
+/* Sidebar select boxes and dropdown structures */
 [data-testid="stSidebar"] [data-baseweb="select"] {
     background: rgba(0,200,255,0.05) !important;
     border: 1px solid rgba(0,200,255,0.2) !important;
     border-radius: 8px !important;
+}
+[data-baseweb="popover"] * {
+    color: #31333F !important; /* Retain dropdown content text readability outside sidebar container */
 }
 [data-testid="stSidebar"] [data-baseweb="select"] * {
     background: #051525 !important;
@@ -54,7 +85,7 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     background: transparent !important;
 }
 
-/* Fix text input */
+/* Text Input controls */
 [data-testid="stSidebar"] input {
     background: rgba(0,200,255,0.05) !important;
     border: 1px solid rgba(0,200,255,0.2) !important;
@@ -65,12 +96,12 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     color: rgba(255,255,255,0.3) !important;
 }
 
-/* Slider */
+/* Slider Track Elements */
 [data-testid="stSidebar"] [data-testid="stSlider"] * {
     color: white !important;
 }
 
-/* Sidebar title */
+/* Custom UI Header Decorator components */
 .sidebar-title {
     color: white !important;
     font-size: 1rem;
@@ -81,7 +112,7 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     margin-bottom: 1.2rem;
 }
 
-/* Reset button */
+/* Action Trigger Elements */
 .stButton > button {
     background: linear-gradient(135deg, #0066ff, #00ccff) !important;
     border: none !important;
@@ -95,9 +126,10 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
 }
 .stButton > button:hover {
     opacity: 0.9 !important;
+    color: white !important;
 }
 
-/* HEADER STRIP */
+/* DISPLAY CARD PANELS */
 .top-strip {
     background: linear-gradient(90deg, #0066ff15, #00ccff15, #0066ff15);
     border: 1px solid rgba(0,200,255,0.15);
@@ -126,7 +158,7 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     opacity: 0.7;
 }
 
-/* HERO SECTION */
+/* HERO PROMOTION INTERFACE */
 .hero {
     background: linear-gradient(135deg, #030d1a 0%, #051a30 40%, #0a2a4a 100%);
     border: 1px solid rgba(0,200,255,0.1);
@@ -170,7 +202,7 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     line-height: 1.6;
 }
 
-/* METRIC STRIP */
+/* STATISTICAL METRIC CARDS */
 .metric-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -215,7 +247,7 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     margin-top: 0.3rem;
 }
 
-/* CHART CARDS */
+/* SEGMENT BLOCK CONTAINER COMPONENTS */
 .chart-card {
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.06);
@@ -256,7 +288,6 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     margin: 0.15rem 0 0 0;
 }
 
-/* SECTION LABEL */
 .section-label {
     font-size: 0.62rem;
     font-weight: 700;
@@ -275,7 +306,7 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     background: rgba(0,200,255,0.1);
 }
 
-/* TABS */
+/* NAVIGATION TABS MASKING */
 .stTabs [data-baseweb="tab-list"] {
     background: rgba(255,255,255,0.03) !important;
     border: 1px solid rgba(255,255,255,0.06) !important;
@@ -297,14 +328,16 @@ header[data-testid="stHeader"] { background: transparent !important; height: 0 !
     font-weight: 600 !important;
 }
 
-/* DATAFRAME */
+/* DATA INTERFACE ELEMENTS */
 [data-testid="stDataFrame"] {
     border-radius: 10px !important;
     border: 1px solid rgba(255,255,255,0.06) !important;
 }
 
-/* General text */
-p, span, label, div { color: rgba(255,255,255,0.8); }
+/* Scoped body content font specifications */
+.stApp p, .stApp span, .stApp label, .stApp h1, .stApp h2, .stApp h3 { 
+    color: rgba(255,255,255,0.9); 
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -319,18 +352,18 @@ with st.sidebar:
     st.markdown('<div class="sidebar-title">🌊 Filter Data</div>', unsafe_allow_html=True)
 
     year_range = st.slider("Year Range",
-        float(df['year'].min()), float(df['year'].max()),
-        (float(df['year'].min()), float(df['year'].max())))
+                           float(df['year'].min()), float(df['year'].max()),
+                           (float(df['year'].min()), float(df['year'].max())))
 
     era = st.selectbox("Era", ['All', '1990s', '2000s', '2010s', '2020s'])
 
     altimeter = st.selectbox("Altimeter Type",
-        ['All', 'Dual Frequency', 'Single Frequency'])
+                             ['All', 'Dual Frequency', 'Single Frequency'])
 
     gmsl_min = float(df['gmsl_gia'].min())
     gmsl_max = float(df['gmsl_gia'].max())
     gmsl_range = st.slider("Sea Level Range (mm)",
-        gmsl_min, gmsl_max, (gmsl_min, gmsl_max))
+                           gmsl_min, gmsl_max, (gmsl_min, gmsl_max))
 
     search = st.text_input("Search by Year", placeholder="e.g. 2010")
 

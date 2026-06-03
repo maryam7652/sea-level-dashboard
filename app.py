@@ -3,120 +3,68 @@ from filters import load_data, apply_filters
 import charts
 
 # ── CONFIGURATION ──
-# Force light mode by default using theme configuration injection
 st.set_page_config(page_title="Sea Level Dashboard", 
                    page_icon="🌊", 
                    layout="wide",
                    initial_sidebar_state="expanded")
 
-# Injecting configuration defaults to force system/light baseline safely
+# Injecting dynamic CSS using Streamlit's native variables to support BOTH Light and Dark modes
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* Typography baseline */
 * { font-family: 'Space Grotesk', sans-serif; }
 
-/* Main app structural background */
-.stApp { background-color: #030d1a !important; }
-
-/* Remove white bar or masking artifacting at top header */
-#root > div:first-child { background: transparent; }
-.stApp > header { background: transparent !important; }
-header[data-testid="stHeader"] { background: transparent !important; height: 0 !important; }
-
+/* Remove top padding block */
 .block-container { 
     padding-top: 1.5rem !important; 
-    background: transparent !important;
     max-width: 100% !important;
 }
+header[data-testid="stHeader"] { background: transparent !important; height: 0 !important; }
 
-/* FIXING APPLIED MATPLOTLIB IMAGES TO PREVENT "BOX OVER BACKGROUND" EFFECT */
-div[data-testid="stImage"], div[data-testid="stPlotlyChart"], .stMarkdown div img {
-    background-color: transparent !important;
-    border-radius: 8px;
-}
-iframe {
-    background: transparent !important;
-}
+/* Let Streamlit handle menu colors dynamically */
+[data-testid="stDecoration"] { display: none !important; }
 
-/* FIXING THREE-DOT OVERFLOW CONFIG MENU TEXT COLLISION */
-button[data-testid="stHeaderActionButton"] {
-    color: #ffffff !important;
-}
-div[data-testid="stMainMenuDropdown"] * {
-    color: #31333F !important; /* Force readable text color inside popover menu options */
-}
-[data-testid="stDecoration"] {
-    background-image: none !important;
-    background-color: transparent !important;
-}
-
-/* SIDEBAR STRUCTURAL STYLING */
+/* SIDEBAR STYLING */
 [data-testid="stSidebar"] {
-    background: #051525 !important;
-    border-right: 1px solid rgba(0,200,255,0.1);
+    border-right: 1px solid rgba(128,128,128,0.2);
 }
 [data-testid="stSidebar"] > div:first-child { padding: 1.5rem 1rem; }
-[data-testid="stSidebar"] p, [data-testid="stSidebar"] span { color: white !important; }
 [data-testid="stSidebar"] label {
-    color: rgba(0,200,255,0.7) !important;
+    color: #00ccff !important;
     font-size: 0.68rem !important;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-weight: 600;
 }
 
-/* Sidebar select boxes and dropdown structures */
-[data-testid="stSidebar"] [data-baseweb="select"] {
-    background: rgba(0,200,255,0.05) !important;
-    border: 1px solid rgba(0,200,255,0.2) !important;
-    border-radius: 8px !important;
-}
-[data-baseweb="popover"] * {
-    color: #31333F !important; /* Retain dropdown content text readability outside sidebar container */
-}
-[data-testid="stSidebar"] [data-baseweb="select"] * {
-    background: #051525 !important;
-    color: white !important;
-}
-[data-testid="stSidebar"] [data-baseweb="select"] div {
-    color: white !important;
-    background: transparent !important;
-}
-
-/* Text Input controls */
+/* Input controls adapting to light/dark mode */
 [data-testid="stSidebar"] input {
-    background: rgba(0,200,255,0.05) !important;
-    border: 1px solid rgba(0,200,255,0.2) !important;
-    color: white !important;
+    background: var(--secondary-background-color) !important;
+    border: 1px solid rgba(128,128,128,0.3) !important;
+    color: var(--text-color) !important;
     border-radius: 8px !important;
 }
 [data-testid="stSidebar"] input::placeholder {
-    color: rgba(255,255,255,0.3) !important;
+    color: var(--text-color) !important;
+    opacity: 0.4 !important;
 }
 
-/* Slider Track Elements */
-[data-testid="stSidebar"] [data-testid="stSlider"] * {
-    color: white !important;
-}
-
-/* Custom UI Header Decorator components */
 .sidebar-title {
-    color: white !important;
+    color: var(--text-color) !important;
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(0,200,255,0.15);
+    border-bottom: 1px solid rgba(128,128,128,0.2);
     margin-bottom: 1.2rem;
 }
 
-/* Action Trigger Elements */
 .stButton > button {
     background: linear-gradient(135deg, #0066ff, #00ccff) !important;
     border: none !important;
-    color: white !important;
+    color: white !important; /* Button text stays white on the blue gradient */
     width: 100%;
     border-radius: 8px !important;
     font-weight: 600 !important;
@@ -124,44 +72,11 @@ div[data-testid="stMainMenuDropdown"] * {
     padding: 0.5rem !important;
     margin-top: 0.5rem;
 }
-.stButton > button:hover {
-    opacity: 0.9 !important;
-    color: white !important;
-}
 
-/* DISPLAY CARD PANELS */
-.top-strip {
-    background: linear-gradient(90deg, #0066ff15, #00ccff15, #0066ff15);
-    border: 1px solid rgba(0,200,255,0.15);
-    border-radius: 12px;
-    padding: 0.6rem 1.5rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.strip-badge {
-    background: rgba(0,200,255,0.15);
-    border: 1px solid rgba(0,200,255,0.3);
-    color: #00ccff !important;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 0.25rem 0.7rem;
-    border-radius: 20px;
-}
-.strip-title {
-    color: white !important;
-    font-size: 0.9rem;
-    font-weight: 500;
-    opacity: 0.7;
-}
-
-/* HERO PROMOTION INTERFACE */
+/* HERO SECTION */
 .hero {
-    background: linear-gradient(135deg, #030d1a 0%, #051a30 40%, #0a2a4a 100%);
-    border: 1px solid rgba(0,200,255,0.1);
+    background: var(--secondary-background-color);
+    border: 1px solid rgba(128,128,128,0.2);
     border-radius: 16px;
     padding: 2.5rem;
     margin-bottom: 1.5rem;
@@ -176,167 +91,73 @@ div[data-testid="stMainMenuDropdown"] * {
     background: linear-gradient(90deg, transparent, #00ccff, #0066ff, transparent);
 }
 .hero-eyebrow {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: #00ccff !important;
-    margin-bottom: 0.8rem;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #00ccff !important; margin-bottom: 0.8rem;
 }
 .hero-title {
-    font-size: 3rem;
-    font-weight: 700;
-    color: white !important;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.8rem;
+    font-size: 3rem; font-weight: 700; color: var(--text-color) !important;
+    line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 0.8rem;
 }
-.hero-title em {
-    font-style: normal;
-    color: #00ccff !important;
-}
+.hero-title em { font-style: normal; color: #00ccff !important; }
 .hero-desc {
-    font-size: 0.88rem;
-    color: rgba(255,255,255,0.45) !important;
-    max-width: 500px;
-    line-height: 1.6;
+    font-size: 0.88rem; color: var(--text-color) !important; opacity: 0.7; max-width: 500px; line-height: 1.6;
 }
 
-/* STATISTICAL METRIC CARDS */
-.metric-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
+/* METRIC CARDS */
+.metric-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
 .metric-item {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 10px;
-    padding: 1.2rem 1.5rem;
-    position: relative;
-    overflow: hidden;
+    background: var(--secondary-background-color);
+    border: 1px solid rgba(128,128,128,0.2);
+    border-radius: 10px; padding: 1.2rem 1.5rem; position: relative; overflow: hidden;
 }
-.metric-item::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-}
+.metric-item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
 .metric-item.blue::before { background: linear-gradient(90deg, #0066ff, #00ccff); }
 .metric-item.teal::before { background: linear-gradient(90deg, #00ccff, #00ffcc); }
 .metric-item.purple::before { background: linear-gradient(90deg, #7c3aed, #a855f7); }
 .metric-item.orange::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
 .metric-label {
-    font-size: 0.65rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: rgba(255,255,255,0.4) !important;
-    margin-bottom: 0.4rem;
+    font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--text-color) !important; opacity: 0.6; margin-bottom: 0.4rem;
 }
-.metric-value {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white !important;
-    line-height: 1;
-}
-.metric-sub {
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.3) !important;
-    margin-top: 0.3rem;
-}
+.metric-value { font-size: 1.8rem; font-weight: 700; color: var(--text-color) !important; line-height: 1; }
+.metric-sub { font-size: 0.72rem; color: var(--text-color) !important; opacity: 0.5; margin-top: 0.3rem; }
 
-/* SEGMENT BLOCK CONTAINER COMPONENTS */
+/* CHARTS */
 .chart-card {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.2rem;
+    background: var(--secondary-background-color);
+    border: 1px solid rgba(128,128,128,0.2);
+    border-radius: 12px; padding: 1.5rem; margin-bottom: 1.2rem;
 }
 .chart-card-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.8rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 1rem; padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(128,128,128,0.1);
 }
 .chart-num {
-    background: linear-gradient(135deg, #0066ff, #00ccff);
-    color: white !important;
-    font-size: 0.6rem;
-    font-weight: 700;
-    min-width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2px;
+    background: linear-gradient(135deg, #0066ff, #00ccff); color: white !important; font-size: 0.6rem;
+    font-weight: 700; min-width: 22px; height: 22px; border-radius: 6px; display: inline-flex;
+    align-items: center; justify-content: center; margin-top: 2px;
 }
-.chart-info-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: white !important;
-    margin: 0;
-}
-.chart-info-desc {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.35) !important;
-    margin: 0.15rem 0 0 0;
-}
+.chart-info-title { font-size: 0.95rem; font-weight: 600; color: var(--text-color) !important; margin: 0; }
+.chart-info-desc { font-size: 0.75rem; color: var(--text-color) !important; opacity: 0.6; margin: 0.15rem 0 0 0; }
 
 .section-label {
-    font-size: 0.62rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: rgba(0,200,255,0.6) !important;
-    margin: 1.8rem 0 1rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em;
+    color: #00ccff !important; margin: 1.8rem 0 1rem 0; display: flex; align-items: center; gap: 0.6rem;
 }
-.section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(0,200,255,0.1);
-}
+.section-label::after { content: ''; flex: 1; height: 1px; background: rgba(128,128,128,0.2); }
 
-/* NAVIGATION TABS MASKING */
+/* TABS */
 .stTabs [data-baseweb="tab-list"] {
-    background: rgba(255,255,255,0.03) !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 10px !important;
-    padding: 3px !important;
-    gap: 2px !important;
+    background: var(--secondary-background-color) !important;
+    border: 1px solid rgba(128,128,128,0.2) !important;
+    border-radius: 10px !important; padding: 3px !important; gap: 2px !important;
 }
 .stTabs [data-baseweb="tab"] {
-    background: transparent !important;
-    border-radius: 7px !important;
-    color: rgba(255,255,255,0.4) !important;
-    font-size: 0.8rem !important;
-    font-weight: 500 !important;
-    padding: 0.45rem 1rem !important;
+    background: transparent !important; border-radius: 7px !important;
+    color: var(--text-color) !important; font-size: 0.8rem !important; font-weight: 500 !important;
 }
 .stTabs [aria-selected="true"] {
-    background: rgba(0,200,255,0.12) !important;
-    color: #00ccff !important;
-    font-weight: 600 !important;
-}
-
-/* DATA INTERFACE ELEMENTS */
-[data-testid="stDataFrame"] {
-    border-radius: 10px !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-}
-
-/* Scoped body content font specifications */
-.stApp p, .stApp span, .stApp label, .stApp h1, .stApp h2, .stApp h3 { 
-    color: rgba(255,255,255,0.9); 
+    background: rgba(0,200,255,0.12) !important; color: #00ccff !important; font-weight: 600 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -430,8 +251,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 # ── TAB 1 ──
 with tab1:
-    st.markdown('<div class="section-label">Proportional and Frequency Analysis</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Proportional and Frequency Analysis</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
     st.markdown("""<div class="chart-card-header">
@@ -439,7 +259,7 @@ with tab1:
         <div><p class="chart-info-title">Altimeter Type Distribution</p>
         <p class="chart-info-desc">Proportional split between dual and single frequency altimeter types</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.pie_chart(filtered_df))
+    st.pyplot(charts.pie_chart(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -448,7 +268,7 @@ with tab1:
         <div><p class="chart-info-title">Sea Level Variation Distribution</p>
         <p class="chart-info-desc">Frequency histogram of GMSL values across all measurements</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.histogram(filtered_df))
+    st.pyplot(charts.histogram(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -457,13 +277,12 @@ with tab1:
         <div><p class="chart-info-title">Measurements by Altimeter Type</p>
         <p class="chart-info-desc">Count of total readings taken by each altimeter instrument</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.count_plot(filtered_df))
+    st.pyplot(charts.count_plot(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 2 ──
 with tab2:
-    st.markdown('<div class="section-label">Trends Over Time and Categories</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Trends Over Time and Categories</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
     st.markdown("""<div class="chart-card-header">
@@ -471,7 +290,7 @@ with tab2:
         <div><p class="chart-info-title">Sea Level Rise Over Time</p>
         <p class="chart-info-desc">Raw and smoothed GMSL from 1993 to 2025 showing clear upward trend</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.line_chart(filtered_df))
+    st.pyplot(charts.line_chart(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -480,7 +299,7 @@ with tab2:
         <div><p class="chart-info-title">Average Sea Level by Decade</p>
         <p class="chart-info-desc">Bar comparison of mean sea level values across each decade</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.bar_chart(filtered_df))
+    st.pyplot(charts.bar_chart(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -489,13 +308,12 @@ with tab2:
         <div><p class="chart-info-title">Cumulative Sea Level Rise</p>
         <p class="chart-info-desc">Area chart showing the total accumulated rise over the entire period</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.area_chart(filtered_df))
+    st.pyplot(charts.area_chart(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 3 ──
 with tab3:
-    st.markdown('<div class="section-label">Statistical Relationships and Distributions</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Statistical Relationships and Distributions</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
     st.markdown("""<div class="chart-card-header">
@@ -503,7 +321,7 @@ with tab3:
         <div><p class="chart-info-title">GIA vs Non-GIA Measurements</p>
         <p class="chart-info-desc">Scatter relationship between corrected and uncorrected sea level readings</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.scatter_plot(filtered_df))
+    st.pyplot(charts.scatter_plot(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -512,7 +330,7 @@ with tab3:
         <div><p class="chart-info-title">Sea Level Distribution by Era</p>
         <p class="chart-info-desc">Box plot showing spread, median and outliers per era</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.box_plot(filtered_df))
+    st.pyplot(charts.box_plot(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -521,7 +339,7 @@ with tab3:
         <div><p class="chart-info-title">Feature Correlation Heatmap</p>
         <p class="chart-info-desc">Correlation matrix between all sea level measurement variables</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.heatmap(filtered_df))
+    st.pyplot(charts.heatmap(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -530,29 +348,26 @@ with tab3:
         <div><p class="chart-info-title">Sea Level Density by Era</p>
         <p class="chart-info-desc">Violin plot showing probability density of sea level per era</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.violin_plot(filtered_df))
+    st.pyplot(charts.violin_plot(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ── TAB 4 ──
 with tab4:
-    st.markdown('<div class="section-label">Raw Data and Statistics</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Raw Data and Statistics</div>', unsafe_allow_html=True)
 
     display_cols = ['year', 'era', 'gmsl_gia', 'smooth_gia',
                     'std_gia', 'altimeter_label', 'num_observations']
     st.dataframe(filtered_df[display_cols].round(2),
                  use_container_width=True, height=450)
 
-    st.markdown('<div class="section-label">Summary Statistics</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Summary Statistics</div>', unsafe_allow_html=True)
     st.dataframe(
         filtered_df[['gmsl_gia', 'smooth_gia', 'std_gia']].describe().round(2),
         use_container_width=True)
 
 # ── TAB 5 ──
 with tab5:
-    st.markdown('<div class="section-label">Bonus Visualizations</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Bonus Visualizations</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
     st.markdown("""<div class="chart-card-header">
@@ -560,7 +375,7 @@ with tab5:
         <div><p class="chart-info-title">Pair Plot - Sea Level Features</p>
         <p class="chart-info-desc">Relationships between all sea level measurement variables combined</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.pair_plot(filtered_df))
+    st.pyplot(charts.pair_plot(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -569,7 +384,7 @@ with tab5:
         <div><p class="chart-info-title">Bubble Chart - Sea Level by Decade</p>
         <p class="chart-info-desc">Bubble size = total observations. Color intensity = sea level rise.</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.bubble_chart(filtered_df))
+    st.pyplot(charts.bubble_chart(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -578,5 +393,5 @@ with tab5:
         <div><p class="chart-info-title">Funnel Chart - Measurements by Era</p>
         <p class="chart-info-desc">Distribution of total satellite measurements across time eras</p></div>
     </div>""", unsafe_allow_html=True)
-    st.pyplot(charts.funnel_chart(filtered_df))
+    st.pyplot(charts.funnel_chart(filtered_df), theme="streamlit")
     st.markdown('</div>', unsafe_allow_html=True)

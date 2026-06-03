@@ -31,57 +31,40 @@ header[data-testid="stHeader"] {
 }
 
 /* =========================================
-   DYNAMIC PINK BACKGROUND THEME
+   DYNAMIC THEME SYNC (FIX FOR CLOUD TOGGLE)
    ========================================= */
+/* By using color-mix with Streamlit's native variables, the dashboard 
+   instantly reacts to the Light/Dark toggle button! */
 
-/* LIGHT MODE (BABY PINK) - DEFAULT */
+/* App Background: Mixes Streamlit's native bg with 8% Maroon */
 [data-testid="stAppViewContainer"] {
-    background-color: #ffe4e6 !important; 
+    background-color: color-mix(in srgb, var(--background-color) 92%, #e11d48) !important; 
 }
+/* Sidebar Background: Mixes with 12% Maroon */
 [data-testid="stSidebar"] {
-    background-color: #fce7f3 !important; 
+    background-color: color-mix(in srgb, var(--secondary-background-color) 88%, #e11d48) !important; 
     border-right: 1px solid rgba(244, 63, 94, 0.2) !important;
 }
+
+/* Cards & Containers */
 .chart-card, .metric-item, .hero {
-    background-color: rgba(255, 255, 255, 0.6) !important;
+    background-color: color-mix(in srgb, var(--secondary-background-color) 70%, transparent) !important;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(244, 63, 94, 0.25) !important;
     box-shadow: 0 8px 20px rgba(244, 63, 94, 0.08);
 }
+
+/* Dynamic Typography Tinting */
 .hero-title, .metric-value, .chart-info-title, .sidebar-title {
-    color: #4c0519 !important; 
+    color: color-mix(in srgb, var(--text-color) 70%, #e11d48) !important; 
 }
 p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
-    color: #881337 !important; 
+    color: color-mix(in srgb, var(--text-color) 85%, #f43f5e) !important; 
 }
 .chart-card-header {
-    background: linear-gradient(90deg, rgba(244, 63, 94, 0.08), transparent);
+    background: linear-gradient(90deg, rgba(244, 63, 94, 0.15), transparent);
 }
 
-/* DARK MODE (DARK PINK / MAROON) - TRIGGERED BY SYSTEM SETTING */
-@media (prefers-color-scheme: dark) {
-    [data-testid="stAppViewContainer"] {
-        background-color: #380b1b !important; 
-    }
-    [data-testid="stSidebar"] {
-        background-color: #2d0513 !important; 
-        border-right: 1px solid rgba(244, 63, 94, 0.3) !important;
-    }
-    .chart-card, .metric-item, .hero {
-        background-color: rgba(0, 0, 0, 0.25) !important;
-        border: 1px solid rgba(244, 63, 94, 0.35) !important;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-    .hero-title, .metric-value, .chart-info-title, .sidebar-title {
-        color: #ffe4e6 !important; 
-    }
-    p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
-        color: #fda4af !important; 
-    }
-    .chart-card-header {
-        background: linear-gradient(90deg, rgba(244, 63, 94, 0.2), transparent) !important;
-    }
-}
 
 /* =========================================
    UI ELEMENTS & EFFECTS
@@ -89,23 +72,18 @@ p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
 
 /* Sidebar Inputs */
 [data-testid="stSidebar"] input, [data-testid="stSidebar"] [data-baseweb="select"] {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: color-mix(in srgb, var(--background-color) 80%, transparent) !important;
     border: 1px solid rgba(244, 63, 94, 0.3) !important;
     border-radius: 8px !important;
+    color: var(--text-color) !important;
 }
 
 /* Fix Multi-Select Tags */
 .stMultiSelect [data-baseweb="tag"] {
-    background-color: rgba(244, 63, 94, 0.15) !important;
-    color: #f43f5e !important;
-    border: 1px solid rgba(244, 63, 94, 0.3) !important;
+    background-color: color-mix(in srgb, var(--background-color) 70%, #f43f5e) !important;
+    color: var(--text-color) !important;
+    border: 1px solid rgba(244, 63, 94, 0.4) !important;
     border-radius: 6px !important;
-}
-@media (prefers-color-scheme: dark) {
-    .stMultiSelect [data-baseweb="tag"] {
-        background-color: rgba(244, 63, 94, 0.3) !important;
-        color: #ffe4e6 !important;
-    }
 }
 
 /* Button Styling */

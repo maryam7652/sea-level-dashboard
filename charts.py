@@ -14,7 +14,7 @@ def _base_fig(w=10, h=5):
     ax.set_facecolor("none")          
     ax.tick_params(colors="#888888", labelsize=9)
     for spine in ax.spines.values():
-        spine.set_edgecolor("rgba(128,128,128,0.25)")
+        spine.set_edgecolor("#80808040") # Safe hex with alpha
     ax.title.set_color("#888888")
     ax.xaxis.label.set_color("#888888")
     ax.yaxis.label.set_color("#888888")
@@ -22,10 +22,10 @@ def _base_fig(w=10, h=5):
 
 def _style_ax(ax):
     """Apply consistent grid + spine styling to any axes."""
-    ax.grid(True, color="rgba(128,128,128,0.15)", linewidth=0.7, linestyle="--")
+    ax.grid(True, color="#80808026", linewidth=0.7, linestyle="--")
     ax.set_axisbelow(True)
     for spine in ax.spines.values():
-        spine.set_edgecolor("rgba(128,128,128,0.25)")
+        spine.set_edgecolor("#80808040")
     ax.tick_params(colors="#888888", labelsize=9)
     return ax
 
@@ -145,7 +145,7 @@ def heatmap(df):
     ax.set_facecolor("none")
     corr = df[['gmsl_no_gia', 'gmsl_gia', 'smooth_gia', 'smooth_no_gia', 'std_gia', 'num_observations']].corr()
                
-    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.8, linecolor='rgba(128,128,128,0.2)',
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.8, linecolor='#80808033',
                 annot_kws={"size": 10}, ax=ax)
                 
     ax.set_title('Correlation Heatmap of Sea Level Features', fontsize=14, fontweight='bold', color='#888888', pad=12)
@@ -170,7 +170,7 @@ def count_plot(df):
     order = df['altimeter_label'].value_counts().index.tolist()
     
     sns.countplot(data=df, x='altimeter_label', order=order, hue='altimeter_label', palette=NEUTRAL_PALETTE[:2],
-                  legend=False, ax=ax, edgecolor='rgba(128,128,128,0.2)', linewidth=0.8)
+                  legend=False, ax=ax, edgecolor='#80808033', linewidth=0.8)
     ax.set_facecolor("none")
     
     ax.set_title('Count of Measurements by Altimeter Type', fontsize=14, fontweight='bold', color='#888888')
@@ -205,7 +205,7 @@ def bubble_chart(df):
     scatter = ax.scatter(
         decade_stats['decade'], decade_stats['avg_sea_level'],
         s=decade_stats['total_obs'] / 500000, c=decade_stats['avg_sea_level'],
-        cmap='RdYlBu_r', alpha=0.82, edgecolors='rgba(128,128,128,0.2)', linewidths=1.5
+        cmap='RdYlBu_r', alpha=0.82, edgecolors='#80808033', linewidths=1.5
     )
     
     for _, row in decade_stats.iterrows():
@@ -217,7 +217,7 @@ def bubble_chart(df):
     cbar.set_label('Avg Sea Level (mm)', color='#888888')
     cbar.ax.yaxis.set_tick_params(color='#888888')
     plt.setp(cbar.ax.yaxis.get_ticklabels(), color='#888888')
-    cbar.outline.set_edgecolor('rgba(128,128,128,0.2)')
+    cbar.outline.set_edgecolor('#80808033')
     
     ax.set_title('Bubble Chart — Sea Level by Decade', fontsize=14, fontweight='bold', color='#888888')
     ax.set_xlabel('Decade')
@@ -236,7 +236,7 @@ def funnel_chart(df):
     values = list(stages.values())
     colors = ["#0ea5e9", "#10b981", "#f59e0b", "#f4845f", "#8b5cf6"]
     
-    bars = ax.barh(labels, values, color=colors, height=0.52, edgecolor='rgba(128,128,128,0.2)', linewidth=0.8)
+    bars = ax.barh(labels, values, color=colors, height=0.52, edgecolor='#80808033', linewidth=0.8)
                    
     for bar, val in zip(bars, values):
         ax.text(bar.get_width() + max(values) * 0.01, bar.get_y() + bar.get_height() / 2,
@@ -261,7 +261,7 @@ def pair_plot(df):
         if ax:
             ax.set_facecolor("none")
             for spine in ax.spines.values():
-                spine.set_edgecolor("rgba(128,128,128,0.2)")
+                spine.set_edgecolor("#80808033")
             ax.tick_params(colors='#888888', labelsize=8)
             
     pg.fig.suptitle('Pair Plot — Sea Level Features', y=1.02, fontsize=14, fontweight='bold', color='#888888')

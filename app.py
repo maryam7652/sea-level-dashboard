@@ -87,6 +87,20 @@ p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
     border-radius: 8px !important;
 }
 
+/* Fix Multi-Select Tags */
+.stMultiSelect [data-baseweb="tag"] {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    color: #f43f5e !important;
+    border: 1px solid rgba(244, 63, 94, 0.3) !important;
+    border-radius: 6px !important;
+}
+@media (prefers-color-scheme: dark) {
+    .stMultiSelect [data-baseweb="tag"] {
+        background-color: rgba(244, 63, 94, 0.3) !important;
+        color: #ffe4e6 !important;
+    }
+}
+
 /* Button Styling */
 .stButton > button {
     background: linear-gradient(135deg, #f43f5e, #fb7185) !important;
@@ -182,12 +196,20 @@ df = get_data()
 # ── SIDEBAR ──
 with st.sidebar:
     st.markdown('<div class="sidebar-title">🌸 Filter Data</div>', unsafe_allow_html=True)
+    
     year_range = st.slider("Year Range", float(df['year'].min()), float(df['year'].max()), (float(df['year'].min()), float(df['year'].max())))
-    era = st.selectbox("Era", ['All', '1990s', '2000s', '2010s', '2020s'])
+    
+    # UPGRADED: Multi-Select Filter for the Era Requirement
+    era = st.multiselect("Era", 
+                         ['1990s', '2000s', '2010s', '2020s'],
+                         default=['1990s', '2000s', '2010s', '2020s'])
+                         
     altimeter = st.selectbox("Altimeter Type", ['All', 'Dual Frequency', 'Single Frequency'])
+    
     gmsl_min = float(df['gmsl_gia'].min())
     gmsl_max = float(df['gmsl_gia'].max())
     gmsl_range = st.slider("Sea Level Range (mm)", gmsl_min, gmsl_max, (gmsl_min, gmsl_max))
+    
     search = st.text_input("Search by Year", placeholder="e.g. 2010")
     
     st.markdown("<br>", unsafe_allow_html=True)

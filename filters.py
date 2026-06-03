@@ -36,12 +36,28 @@ def load_data():
     return df
 
 def apply_filters(df, year_range, era, altimeter, gmsl_range, search):
-    df = df[(df['year'] >= year_range[0]) & (df['year'] <= year_range[1])]
-    if era != 'All':
-        df = df[df['era'] == era]
+    filtered = df.copy()
+
+    # 1. Year Range Filter (Slider)
+    filtered = filtered[(filtered['year'] >= year_range[0]) & (filtered['year'] <= year_range[1])]
+
+    # 2. Multi-Select Filter (Era Requirement)
+    if era: # As long as the user hasn't un-checked every box
+        filtered = filtered[filtered['era'].isin(era)]
+    else:
+        # If they clear the multi-select completely, show no data
+        filtered = filtered[filtered['era'].isin([])]
+
+    # 3. Category Filter Dropdown (Altimeter)
     if altimeter != 'All':
-        df = df[df['altimeter_label'] == altimeter]
-    df = df[(df['gmsl_gia'] >= gmsl_range[0]) & (df['gmsl_gia'] <= gmsl_range[1])]
+        filtered = filtered[filtered['altimeter_label'] == altimeter]
+
+    # 4. Numerical Range Filter
+    filtered = filtered[(filtered['gmsl_gia'] >= gmsl_range[0]) & (filtered['gmsl_gia'] <= gmsl_range[1])]
+
+    # 5. Search / Text Filter
     if search:
-        df = df[df['year'].astype(str).str.contains(search, na=False)]
-    return df
+        # Check if the search text is inside the year string
+        filtered = filtered[filtered['year'].astype(str).str.contains(search, case=False, na=False)]
+
+    return filtered

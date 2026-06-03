@@ -27,17 +27,16 @@ header[data-testid="stHeader"], [data-testid="stDecoration"] {
     display: none !important; 
 }
 
-
 /* =========================================
    DYNAMIC PINK BACKGROUND THEME
    ========================================= */
 
 /* LIGHT MODE (BABY PINK) - DEFAULT */
 [data-testid="stAppViewContainer"] {
-    background-color: #ffe4e6 !important; /* Baby Pink */
+    background-color: #ffe4e6 !important; 
 }
 [data-testid="stSidebar"] {
-    background-color: #fce7f3 !important; /* Soft Blush */
+    background-color: #fce7f3 !important; 
     border-right: 1px solid rgba(244, 63, 94, 0.2) !important;
 }
 .chart-card, .metric-item, .hero {
@@ -47,19 +46,22 @@ header[data-testid="stHeader"], [data-testid="stDecoration"] {
     box-shadow: 0 8px 20px rgba(244, 63, 94, 0.08);
 }
 .hero-title, .metric-value, .chart-info-title, .sidebar-title {
-    color: #4c0519 !important; /* Deep Maroon text for readability */
+    color: #4c0519 !important; 
 }
 p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
-    color: #881337 !important; /* Medium Maroon */
+    color: #881337 !important; 
+}
+.chart-card-header {
+    background: linear-gradient(90deg, rgba(244, 63, 94, 0.08), transparent);
 }
 
 /* DARK MODE (DARK PINK / MAROON) - TRIGGERED BY SYSTEM SETTING */
 @media (prefers-color-scheme: dark) {
     [data-testid="stAppViewContainer"] {
-        background-color: #380b1b !important; /* Deep Dark Pink/Maroon */
+        background-color: #380b1b !important; 
     }
     [data-testid="stSidebar"] {
-        background-color: #2d0513 !important; /* Darker Pink Sidebar */
+        background-color: #2d0513 !important; 
         border-right: 1px solid rgba(244, 63, 94, 0.3) !important;
     }
     .chart-card, .metric-item, .hero {
@@ -68,13 +70,15 @@ p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
     .hero-title, .metric-value, .chart-info-title, .sidebar-title {
-        color: #ffe4e6 !important; /* Baby pink text for dark mode */
+        color: #ffe4e6 !important; 
     }
     p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
-        color: #fda4af !important; /* Soft pink */
+        color: #fda4af !important; 
+    }
+    .chart-card-header {
+        background: linear-gradient(90deg, rgba(244, 63, 94, 0.2), transparent) !important;
     }
 }
-
 
 /* =========================================
    UI ELEMENTS & EFFECTS
@@ -141,7 +145,6 @@ p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
 .metric-item::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
 }
-/* All Pink/Rose Gradients for Metrics */
 .metric-item.rose::before   { background: linear-gradient(90deg, #f43f5e, #fb7185); }
 .metric-item.blush::before  { background: linear-gradient(90deg, #fb7185, #fda4af); }
 .metric-item.mauve::before  { background: linear-gradient(90deg, #d946ef, #f43f5e); }
@@ -150,16 +153,29 @@ p, span, label, .hero-desc, .metric-sub, .chart-info-desc {
 .metric-label { font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
 .metric-value { font-size: 2rem; }
 
-/* Chart Cards Base */
-.chart-card { border-radius: 14px; padding: 1.6rem; margin-bottom: 1.2rem; }
+/* ── EDITORIAL CHART HEADERS ── */
+.chart-card { border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; }
 .chart-card-header {
-    display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 1rem; padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(244, 63, 94, 0.15);
+    display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; padding: 1rem 1.2rem;
+    border-radius: 10px;
+    border-left: 4px solid #f43f5e;
+}
+.chart-card-header > div {
+    display: flex; flex-direction: column; gap: 0.2rem;
 }
 .chart-num {
-    background: linear-gradient(135deg, #f43f5e, #fb7185); color: white !important; 
-    font-size: 0.58rem; font-weight: 700; min-width: 22px; height: 22px; border-radius: 6px;
-    display: inline-flex; align-items: center; justify-content: center; margin-top: 2px;
+    background: linear-gradient(135deg, #e11d48, #fb7185); color: white !important; 
+    font-size: 0.95rem; font-weight: 700; min-width: 36px; height: 36px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); margin: 0; flex-shrink: 0;
+}
+.chart-info-title { 
+    font-family: 'Cormorant Garamond', serif !important; 
+    font-size: 1.45rem !important; font-weight: 700 !important; 
+    margin: 0 !important; line-height: 1.1; 
+}
+.chart-info-desc { 
+    font-size: 0.88rem !important; font-weight: 500; opacity: 0.85; margin: 0 !important; 
 }
 
 /* Tabs - Fixed Padding and Layout */
@@ -199,7 +215,6 @@ with st.sidebar:
     
     year_range = st.slider("Year Range", float(df['year'].min()), float(df['year'].max()), (float(df['year'].min()), float(df['year'].max())))
     
-    # UPGRADED: Multi-Select Filter for the Era Requirement
     era = st.multiselect("Era", 
                          ['1990s', '2000s', '2010s', '2020s'],
                          default=['1990s', '2000s', '2010s', '2020s'])

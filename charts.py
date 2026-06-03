@@ -19,9 +19,9 @@ def _apply_dark_transparent_theme(fig, ax=None):
         a.yaxis.label.set_color('white') # Y-axis label
         a.title.set_color('white')       # Title
         
-        # Soften the bounding box lines so they aren't harsh black
+        # Soften the bounding box lines using Matplotlib-safe hex with alpha (#ffffff33 is 20% white)
         for spine in a.spines.values():
-            spine.set_color('rgba(255, 255, 255, 0.2)')
+            spine.set_color('#ffffff33')
 
 
 def pie_chart(df):
@@ -30,7 +30,6 @@ def pie_chart(df):
     if counts.empty:
         ax.text(0.5, 0.5, 'No data', ha='center', color='white')
     else:
-        # Added textprops to ensure percentage text is white
         ax.pie(counts, labels=counts.index, autopct='%1.1f%%',
                colors=['#4facfe', '#f093fb'], startangle=90, 
                textprops={'color': 'white', 'fontweight': 'bold'})
@@ -56,11 +55,11 @@ def line_chart(df):
     ax.set_xlabel('Year')
     ax.set_ylabel('Sea Level Variation (mm)')
     
-    legend = ax.legend(facecolor='#051525', edgecolor='rgba(255,255,255,0.2)')
+    legend = ax.legend(facecolor='#051525', edgecolor='#ffffff33')
     for text in legend.get_texts():
         text.set_color("white")
         
-    ax.grid(True, color='rgba(255,255,255,0.1)')
+    ax.grid(True, color='#ffffff1a') # #ffffff1a is 10% white
     _apply_dark_transparent_theme(fig, ax)
     return fig
 
@@ -82,7 +81,7 @@ def scatter_plot(df):
     ax.set_title('GMSL with GIA vs without GIA', fontsize=14, fontweight='bold')
     ax.set_xlabel('GMSL without GIA (mm)')
     ax.set_ylabel('GMSL with GIA (mm)')
-    ax.grid(True, color='rgba(255,255,255,0.1)')
+    ax.grid(True, color='#ffffff1a')
     _apply_dark_transparent_theme(fig, ax)
     return fig
 
@@ -121,7 +120,7 @@ def area_chart(df):
     ax.set_title('Cumulative Sea Level Rise Over Time', fontsize=14, fontweight='bold')
     ax.set_xlabel('Year')
     ax.set_ylabel('Sea Level Variation (mm)')
-    ax.grid(True, color='rgba(255,255,255,0.1)')
+    ax.grid(True, color='#ffffff1a')
     _apply_dark_transparent_theme(fig, ax)
     return fig
 
@@ -175,7 +174,7 @@ def bubble_chart(df):
     ax.set_title('Bubble Chart - Sea Level by Decade', fontsize=14, fontweight='bold')
     ax.set_xlabel('Decade')
     ax.set_ylabel('Average Sea Level Variation (mm)')
-    ax.grid(True, color='rgba(255,255,255,0.1)')
+    ax.grid(True, color='#ffffff1a')
     _apply_dark_transparent_theme(fig, ax)
     return fig
 
@@ -208,6 +207,5 @@ def pair_plot(df):
     pg = sns.pairplot(sample, plot_kws={'alpha': 0.5, 'color': '#00ccff'})
     pg.fig.suptitle('Pair Plot - Sea Level Features', y=1.02, fontsize=14, fontweight='bold', color='white')
     
-    # Apply theme across the entire grid of subplots
     _apply_dark_transparent_theme(pg.fig)
     return pg.fig

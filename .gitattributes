@@ -1,1 +1,2 @@
 *.txt filter=lfs diff=lfs merge=lfs -text
+GMSL_TPJAOS_5.2.txt filter=lfs diff=lfs merge=lfs -text
